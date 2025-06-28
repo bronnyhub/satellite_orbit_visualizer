@@ -1,3 +1,6 @@
+### I resign from doing the SQL part, because of the problems with recalculating data. 
+### With SQL in use, the orbits would shown weirdly (they would not appear as a oval)
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from sgp4.api import Satrec, jday
@@ -53,7 +56,7 @@ def compute_orbit(name, minutes=90):
     sat = Satrec.twoline2rv(line1, line2)
     positions = []
 
-    start_time = start_time = datetime.now(timezone.utc)
+    start_time = datetime.now(timezone.utc)  
     for i in range(minutes):
         t = start_time + timedelta(minutes=i)
         jd, fr = jday(t.year, t.month, t.day, t.hour, t.minute, t.second)
@@ -79,17 +82,15 @@ def plot_earth(ax, radius=6371):
     
     ls = LightSource(azdeg=135, altdeg=45)
     rgb = np.ones((x.shape[0], x.shape[1], 3))
-    rgb[:,:,:] = np.array([0.1, 0.3, 0.8])  # Base ocean color
+    rgb[:,:,:] = np.array([0.1, 0.3, 0.8])
     
-    # Add shading
     shade = ls.shade_normals(np.dstack((x, y, z)), fraction=0.8)
-    shade = shade[..., np.newaxis]  # Expand dims to (50, 50, 1)
+    shade = shade[..., np.newaxis] 
     earth = ax.plot_surface(x, y, z, facecolors=rgb*shade, 
                        rstride=1, cstride=1, alpha=0.7, 
                        linewidth=0, antialiased=True,
                        zorder=0)
     
-    # Add continent outlines (simplified)
     theta = np.linspace(0, 2*np.pi, 100)
     for lat in np.linspace(-np.pi/2, np.pi/2, 7):
         x_c = radius * np.cos(lat) * np.cos(theta)
@@ -105,40 +106,32 @@ def plot_earth(ax, radius=6371):
     
     return earth
 
-# --- Animate in 3D ---
 def animate_orbit(positions, name):
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
     ax.set_title(f"Animated Orbit: {name}", fontsize=14, pad=20)
     
-    # Set axes limits based on satellite altitude (LEO)
     max_range = 8000
     ax.set_xlim(-max_range, max_range)
     ax.set_ylim(-max_range, max_range)
     ax.set_zlim(-max_range, max_range)
     
-    # Improve axis labels
     ax.set_xlabel("X (km)", fontsize=10, labelpad=10)
     ax.set_ylabel("Y (km)", fontsize=10, labelpad=10)
     ax.set_zlabel("Z (km)", fontsize=10, labelpad=10)
     
-    # Add grid with some transparency
     ax.grid(True, alpha=0.3)
     
-    # Improved Earth visualization
     earth = plot_earth(ax)
     earth.set_alpha(0.4)
     
-    # Satellite orbit visualization
     xs, ys, zs = [], [], []
     line, = ax.plot([], [], [], color='red', linewidth=1.5, label=f'{name} Orbit', zorder=10)
     point, = ax.plot([], [], [], 'o', color='yellow', markersize=6, label=f'{name} Position', zorder=10)
     
-    # Add legend and adjust viewing angle
     ax.legend(loc='upper right', fontsize=9)
     ax.view_init(elev=25, azim=45)
     
-    # Add some informational text
     info_text = ax.text2D(0.02, 0.95, "", transform=ax.transAxes, fontsize=9)
     
     def update(i):
@@ -154,7 +147,6 @@ def animate_orbit(positions, name):
             point.set_data([x], [y])
             point.set_3d_properties([z])
             
-            # Update info text with current position
             info_text.set_text(f"Position: {i+1}/{len(positions)}\nX: {x:.1f} km\nY: {y:.1f} km\nZ: {z:.1f} km")
             
         return line, point, info_text
@@ -163,7 +155,6 @@ def animate_orbit(positions, name):
     plt.tight_layout()
     plt.show()
 
-# --- Main ---
 if __name__ == "__main__":
     print("📡 Kinéis Orbit Visualizer")
     sat_choice = input("Choose satellite (2A-E or 4A-E): ").strip().upper()
