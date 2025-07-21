@@ -1,7 +1,7 @@
 # Kinéis Satellite Orbit Visualizer
 
-<img src="example.png" width='300'> 
-*(Example visualization)*
+<img src="example.png" width='400'> 
+(Example visualization)
 
 ## Project Overview
 
